@@ -1,0 +1,7 @@
+FROM @IMAGE@
+
+RUN sudo dnf install -y cargo rustfmt llvm-devel clang-devel mbedtls-devel pkcs11-helper-devel
+
+VOLUME /tmp/build
+WORKDIR /tmp/build
+CMD cargo fmt -- --check && cargo build --verbose && cargo test --verbose

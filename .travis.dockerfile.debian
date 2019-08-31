@@ -1,0 +1,8 @@
+FROM @IMAGE@
+
+RUN apt-get update
+RUN apt-get install -y build-essential rustc cargo clang llvm-dev libmbedtls-dev
+
+VOLUME /tmp/build
+WORKDIR /tmp/build
+CMD cargo build --verbose && cargo test --verbose

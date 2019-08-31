@@ -17,6 +17,7 @@ fn main() {
     let out_dir = std::path::PathBuf::from(out_dir);
 
     let bindings = bindgen::builder()
+        .detect_include_paths(true)
         .header("src/mbedtls.h")
         .whitelist_function("^mbedtls_.*")
         .whitelist_type("^mbedtls_.*")

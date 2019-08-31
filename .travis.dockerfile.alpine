@@ -1,0 +1,7 @@
+FROM @IMAGE@
+
+RUN apk add rust cargo llvm8-dev clang mbedtls-dev
+
+VOLUME /tmp/build
+WORKDIR /tmp/build
+CMD cargo build --verbose && cargo test --verbose
