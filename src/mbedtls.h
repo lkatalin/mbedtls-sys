@@ -44,7 +44,11 @@
 #include <mbedtls/platform_time.h>
 #include <mbedtls/asn1.h>
 #include <mbedtls/pk.h>
+
+#if MBEDTLS_VERSION_MAJOR >= 2 && MBEDTLS_VERSION_MINOR >= 10
 #include <mbedtls/platform_util.h>
+#endif
+
 #include <mbedtls/x509.h>
 #include <mbedtls/cipher.h>
 #include <mbedtls/x509_crl.h>
@@ -67,8 +71,12 @@
 #include <mbedtls/aes.h>
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/havege.h>
+
+#if MBEDTLS_VERSION_MAJOR >= 2 && MBEDTLS_VERSION_MINOR >= 12
 #include <mbedtls/poly1305.h>
 #include <mbedtls/chacha20.h>
+#endif
+
 #include <mbedtls/xtea.h>
 #include <mbedtls/x509_csr.h>
 #include <mbedtls/version.h>
@@ -90,14 +98,22 @@
 #include <mbedtls/pk_internal.h>
 #include <mbedtls/pem.h>
 #include <mbedtls/padlock.h>
+
+#if MBEDTLS_VERSION_MAJOR >= 2 && MBEDTLS_VERSION_MINOR >= 12
 #include <mbedtls/nist_kw.h>
+#endif
+
 #include <mbedtls/net.h>
 #include <mbedtls/memory_buffer_alloc.h>
 #include <mbedtls/md_internal.h>
 #include <mbedtls/md4.h>
 #include <mbedtls/md2.h>
 #include <mbedtls/hmac_drbg.h>
+
+#if MBEDTLS_VERSION_MAJOR >= 2 && MBEDTLS_VERSION_MINOR >= 11
 #include <mbedtls/hkdf.h>
+#endif
+
 #include <mbedtls/gcm.h>
 #include <mbedtls/error.h>
 #include <mbedtls/entropy_poll.h>
@@ -108,13 +124,21 @@
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/cmac.h>
 #include <mbedtls/cipher_internal.h>
+
+#if MBEDTLS_VERSION_MAJOR >= 2 && MBEDTLS_VERSION_MINOR >= 12
 #include <mbedtls/chachapoly.h>
+#endif
+
 #include <mbedtls/ccm.h>
 #include <mbedtls/camellia.h>
 #include <mbedtls/bn_mul.h>
 #include <mbedtls/blowfish.h>
 #include <mbedtls/base64.h>
 #include <mbedtls/asn1write.h>
+
+#if MBEDTLS_VERSION_MAJOR >= 2 && MBEDTLS_VERSION_MINOR >= 10
 #include <mbedtls/aria.h>
+#endif
+
 #include <mbedtls/arc4.h>
 #include <mbedtls/aesni.h>
