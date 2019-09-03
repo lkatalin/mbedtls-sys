@@ -5,6 +5,7 @@ dist: bionic
 env:
   matrix:
     - IMAGE=alpine:edge
+    - IMAGE=ubuntu:disco
     - IMAGE=debian:latest
     - IMAGE=fedora:latest
 
