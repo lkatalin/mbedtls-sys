@@ -12,17 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use bindgen::callbacks::*;
+
+#[derive(Debug)]
+struct Callbacks;
+
+impl ParseCallbacks for Callbacks {
+    fn int_macro(&self, name: &str, _value: i64) -> Option<IntKind> {
+        if name.starts_with("MBEDTLS_X509_KU_") {
+            Some(IntKind::UInt)
+        } else if name.starts_with("MBEDTLS_X509_BADC") {
+            Some(IntKind::U32)
+        } else {
+            Some(IntKind::Int)
+        }
+    }
+}
+
 fn main() {
     let out_dir = std::env::var_os("OUT_DIR").expect("OUT_DIR undefined");
     let out_dir = std::path::PathBuf::from(out_dir);
 
     let bindings = bindgen::builder()
-        .detect_include_paths(true)
-        .header("src/mbedtls.h")
+        .parse_callbacks(Box::new(Callbacks))
         .whitelist_function("^mbedtls_.*")
         .whitelist_type("^mbedtls_.*")
         .whitelist_var("^MBEDTLS_.*")
         .whitelist_var("^mbedtls_.*")
+        .detect_include_paths(true)
+        .header("src/mbedtls.h")
         .generate()
         .expect("Error generating bindings!");
 
