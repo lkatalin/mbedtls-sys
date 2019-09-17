@@ -16,6 +16,14 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+pub mod types {
+    pub type size_t = usize;
+
+    pub mod raw {
+        pub use ::std::os::raw::*;
+    }
+}
+
 include!(concat!(env!("OUT_DIR"), "/lib.rs"));
 
 #[test]
