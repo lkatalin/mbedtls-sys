@@ -40,6 +40,7 @@ fn main() {
         .whitelist_var("^MBEDTLS_.*")
         .whitelist_var("^mbedtls_.*")
         .detect_include_paths(true)
+        .prepend_enum_name(false)
         .header("src/mbedtls.h")
         .generate()
         .expect("Error generating bindings!");
