@@ -1,0 +1,68 @@
+// Copyright 2019 Red Hat, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+use std::path::{Path, PathBuf};
+
+#[cfg(feature = "vendored")]
+extern crate mbedtls_src;
+
+#[cfg_attr(feature = "vendored", path = "find_vendored.rs")]
+#[cfg_attr(not(feature = "vendored"), path = "find_normal.rs")]
+mod find;
+
+fn main() {
+    let out_dir = std::env::var_os("OUT_DIR").expect("OUT_DIR undefined");
+    let out_dir = std::path::PathBuf::from(out_dir);
+
+    let target = env::var("TARGET").unwrap();
+
+    let (lib_dir, include_dir) = find::get_openssl(&target);
+
+    if !Path::new(&lib_dir).exists() {
+        panic!(
+            "OpenSSL library directory does not exist: {}",
+            lib_dir.to_string_lossy()
+        );
+    }
+    if !Path::new(&include_dir).exists() {
+        panic!(
+            "OpenSSL include directory does not exist: {}",
+            include_dir.to_string_lossy()
+        );
+    }
+
+
+    let libs_env = env("OPENSSL_LIBS");
+    let libs = match libs_env.as_ref().and_then(|s| s.to_str()) {
+        Some(ref v) => v.split(":").collect(),
+        None => match version {
+            Version::Openssl10x if target.contains("windows") => vec!["ssleay32", "libeay32"],
+            Version::Openssl11x if target.contains("windows") => vec!["libssl", "libcrypto"],
+            _ => vec!["ssl", "crypto"],
+        },
+    };
+
+    let kind = determine_mode(Path::new(&lib_dir), &libs);
+    for lib in libs.into_iter() {
+        println!("cargo:rustc-link-lib={}={}", kind, lib);
+    }
+
+    fn check_rustc_versions() {
+        let cfg = autocfg::new();
+
+        if cfg.probe_rustc_version(1, 31) {
+            println!("cargo:rustc-cfg=const_fn");
+        }
+    }
+}
