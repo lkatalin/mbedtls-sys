@@ -29,7 +29,7 @@ impl ParseCallbacks for Callbacks {
     }
 }
 
-fn find_normal() {
+pub fn find_normal() {
     let out_dir = std::env::var_os("OUT_DIR").expect("OUT_DIR undefined");
     let out_dir = std::path::PathBuf::from(out_dir);
 

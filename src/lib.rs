@@ -16,6 +16,8 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+use std::env;
+
 pub mod types {
     pub type size_t = usize;
 
@@ -24,11 +26,10 @@ pub mod types {
     }
 }
 
-include!(concat!(env!("OUT_DIR"), "/lib.rs"));
-
 #[test]
 #[cfg(test)]
 fn version_get_number() {
+
     unsafe {
         assert!(mbedtls_version_get_number() != 0);
     }

@@ -14,82 +14,43 @@
 
 mod find_normal;
 use std::env;
-use std::path::{Path, PathBuf};
-use std::ffi::OsString;
+use std::fs::File;
+use std::io::Write;
+use std::path::PathBuf;
 
-pub fn get_mbedtls(_target: &str) -> (PathBuf, PathBuf) {
+#[cfg(feature = "vendored")]
+pub fn vendored() {
+    println!("cargo:rerun-if-changed=build.rs");
     let artifacts = mbedtls_src::Build::new().build();
-    println!("cargo:vendored=1");
-    println!("cargo:root={}", artifacts.lib_dir().parent().unwrap().display());
+    artifacts.print_cargo_metadata();
 
-    (
-        artifacts.lib_dir().to_path_buf(),
-        artifacts.include_dir().to_path_buf(),
-    )
-}    
-
-fn env_inner(name: &str) -> Option<OsString> {
-    let var = env::var_os(name);
-    println!("cargo:rerun-if-env-changed={}", name);
-
-    match var {
-        Some(ref v) => println!("{} = {}", name, v.to_string_lossy()),
-        None => println!("{} unset", name),
-    }
-
-    var
+    let out_dir = PathBuf::from(env::var_os("OUT_DIR").unwrap());
+    File::create(out_dir.join("include"))
+        .unwrap()
+        .write_all(artifacts.include_dir().to_str().unwrap().as_bytes())
+        .unwrap();
+    File::create(out_dir.join("lib"))
+        .unwrap()
+        .write_all(artifacts.lib_dir().to_str().unwrap().as_bytes())
+        .unwrap();
+    File::create(out_dir.join("target"))
+        .unwrap()
+        .write_all(env::var("TARGET").unwrap().as_bytes())
+        .unwrap();
+    File::create(out_dir.join("mbedtls-src-version"))
+        .unwrap()
+        .write_all(mbedtls_src::version().as_bytes())
+        .unwrap();
 }
 
-fn env(name: &str) -> Option<OsString> {
-    let prefix = env::var("TARGET").unwrap().to_uppercase().replace("-", "_");
-    let prefixed = format!("{}_{}", prefix, name);
-    env_inner(&prefixed).or_else(|| env_inner(name))
-}
-
-fn find_vendored() {
-    let target = env::var("TARGET").unwrap();
-
-    let (lib_dir, include_dir) = get_mbedtls(&target);
-
-    if !Path::new(&lib_dir).exists() {
-        panic!(
-            "OpenSSL library directory does not exist: {}",
-            lib_dir.to_string_lossy()
-        );
-    }
-    if !Path::new(&include_dir).exists() {
-        panic!(
-            "OpenSSL include directory does not exist: {}",
-            include_dir.to_string_lossy()
-        );
-    }
-
-    println!(
-        "cargo:rustc-link-search=native={}",
-        lib_dir.to_string_lossy()
-    );
-
-    println!("cargo:include={}", include_dir.to_string_lossy());
-
-    let libs_env = env("MBEDTLS_LIBS");
-    let libs : Vec<&str> = match libs_env.as_ref().and_then(|s| s.to_str()) {
-        Some(ref v) => v.split(":").collect(),
-        None => panic!("libs matched to none"),
-    };
-
-    for lib in libs.into_iter() {
-        println!("cargo:rustc-link-lib=static={}", lib);
-    }
-
-}
 
 fn main() {
-    let out_dir = std::env::var_os("OUT_DIR").expect("OUT_DIR undefined");
-    let out_dir = std::path::PathBuf::from(out_dir);
+    //let out_dir = std::env::var_os("OUT_DIR").expect("OUT_DIR undefined");
+    //let out_dir = std::path::PathBuf::from(out_dir);
 
     #[cfg(feature = "vendored")]
-    find_vendored();
+    vendored();
 
     #[cfg(not(feature = "vendored"))]
-    find_normal();
+    find_normal::find_normal();
 }
