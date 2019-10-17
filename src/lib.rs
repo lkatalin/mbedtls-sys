@@ -26,8 +26,12 @@ pub mod types {
     }
 }
 
+#[cfg(not(feature = "vendored"))]
+include!(concat!(env!("OUT_DIR"), "/lib.rs"));
+
 #[test]
-#[cfg(test)]
+#[cfg(all(not(feature = "vendored"), test))]
+//#[cfg(test)]
 fn version_get_number() {
 
     unsafe {
