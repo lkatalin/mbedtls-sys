@@ -12,29 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
+use std::os::raw::c_uint;
 
-use std::env;
-
-pub mod types {
-    pub type size_t = usize;
-
-    pub mod raw {
-        pub use ::std::os::raw::*;
-    }
+extern "C" {
+    pub fn mbedtls_version_get_number() -> c_uint;
 }
 
-#[cfg(not(feature = "vendored"))]
-include!(concat!(env!("OUT_DIR"), "/lib.rs"));
-
 #[test]
-#[cfg(all(not(feature = "vendored"), test))]
-//#[cfg(test)]
-fn version_get_number() {
-
+fn version_works() {
     unsafe {
-        assert!(mbedtls_version_get_number() != 0);
+        println!("{:#x}", mbedtls_version_get_number());
+        assert!(mbedtls_version_get_number() > 0);
     }
 }

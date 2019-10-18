@@ -10,12 +10,13 @@ authors = ["Nathaniel McCallum <npmccallum@redhat.com>"]
 repository = "https://github.com/rust-mbedtls/mbedtls-sys"
 
 [dependencies]
-mbedtls-src = { git = "https://github.com/lkatalin/mbedtls-src", branch = "generate_config", optional = true } 
+#mbedtls-src = { git = "https://github.com/lkatalin/mbedtls-src", branch = "generate_config", optional = true } 
+mbedtls-src = { path = "../mbedtls-src/", optional = true }
 
 [build-dependencies]
 bindgen = "0.51.0"
-mbedtls-src = { git = "https://github.com/lkatalin/mbedtls-src", branch = "generate_config", optional = true } 
-
+#mbedtls-src = { git = "https://github.com/lkatalin/mbedtls-src", branch = "generate_config", optional = true } 
+mbedtls-src = { path = "../mbedtls-src/", optional = true }
 
 [features]
 vendored = ['mbedtls-src']
